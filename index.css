@@ -1,0 +1,104 @@
+body{
+    background: #e7eef6;
+    .shapk {
+        background: #0063a8;
+        width: 100%;
+        height: 100px;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 20px;
+        text-transform: uppercase;
+        color: #fff;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        z-index: 100;
+    }
+    .card{
+        width: 500px; 
+        margin-top: 15px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .mb-3{
+        margin-top: 100px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .foot{
+        background-image: url("https://www.mosvodokanal.ru/local/templates/mvk/i/bg-body-water.jpg");
+        width: 100%;
+        height: 500px;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 20px;
+        color: #fff;
+        margin-top: 15px;
+        left: 0;
+        right: 0;
+        top: 0;
+        z-index: 0;
+    }
+
+    .btn-home{
+        margin-left: 25px;     
+        margin-top: 25px;
+        width: 50px;
+        height: 50px;               
+        border: none;                /* отключаем обводку */
+        background: #0063a8;         /* задаем цвет кнопки */
+        color: rgb(255, 255, 255);                /* задаем цвет текста внутри кнопки */
+        font-size: 1.5rem;           /* увеличим размер шрифта */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* сменим шрифт */
+        font-weight: bold;
+        cursor: pointer;             /* при наведении на кнопку курсор будет изменен со стрелки на 'указательный палец' */
+        user-select: none; 
+        text-align: center;
+    }
+    .btn-home:active {
+        filter: brightness(130%); /* увеличим интенсивность цвета для эффекта вспышки */
+    }
+    .btn-home1{
+        margin-left: 25px;     
+        margin-top: 25px;
+        width: 250px;
+        height: 50px;               
+        border: none;                /* отключаем обводку */
+        background: #0063a8;         /* задаем цвет кнопки */
+        color: rgb(255, 255, 255);                /* задаем цвет текста внутри кнопки */
+        font-size: 1.5rem;           /* увеличим размер шрифта */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* сменим шрифт */
+        font-weight: bold;
+        cursor: pointer;             /* при наведении на кнопку курсор будет изменен со стрелки на 'указательный палец' */
+        user-select: none; 
+        text-align: center;
+    }
+    .btn-home1:active {
+        filter: brightness(130%); /* увеличим интенсивность цвета для эффекта вспышки */
+    }
+
+    .btn-primary{
+        font-weight: bold;
+        background: #0063a8;
+        color: #fff;
+        border-width: 0;
+        text-transform: uppercase;
+        font-size: 16px;
+        min-width: 130px;
+        padding: 15px 25px 10px;
+        text-align: center;
+    }
+    .btn-primary:active {
+        filter: brightness(130%);
+    }
+    .btn-primary:hover {
+        background: #0063a8; 
+        text-decoration: underline;
+    } 
+
+}
+
+#main-page{
+    padding-top: 115px;
+}
