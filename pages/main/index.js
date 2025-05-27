@@ -53,6 +53,7 @@ export class MainPage {
                 <div id="main-page" class="d-flex flex-column"><div/>
                 <div class="zadania">
                 <button id="zad12" class="btn-home1" type="button">ДЗ</button>
+                <input type="text" class="search_pg" id="searchInput" placeholder="Введите текст для пока...">
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                                 <div id="ogo" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                                     <div class="toast-header">
@@ -195,10 +196,10 @@ export class MainPage {
             let x = str[i];
             let y = str[j - i];
             if (x != y) {
-                return false
+                return 'нет'
             }
         }
-        return true
+        return 'да'
     }
 
     // 3.8.2
@@ -209,11 +210,29 @@ export class MainPage {
             rev_str += str[i];
         }
         if (rev_str === str) {
-            return true
+            return 'нет'
         }
         else {
-            return false
+            return 'нет'
         }
+    }
+
+    foundFilter(){
+        const searchInput = document.getElementById('searchInput');
+        const searchTerm = searchInput.value.toLowerCase();
+        console.log(searchTerm);
+        const filtData = this.data.filter(card => {
+            const cardText = card.title.toLowerCase();
+            return cardText.includes(searchTerm);
+        });
+        this.pageRoot.querySelector('.cards-container').innerHTML = '';
+        const container = this.pageRoot.querySelector('.cards-container');
+        filtData.forEach((item) => {
+            const productCard = new ProductCardComponent(container);
+            productCard.render(item, this.clickCard.bind(this), this.clickDEL.bind(this));
+        });
+        
+        return filtData;
     }
    
     render() {
@@ -229,6 +248,8 @@ export class MainPage {
             const productCard = new ProductCardComponent(this.pageRoot)
             productCard.render(item, this.clickCard.bind(this), this.clickDEL.bind(this))
         })
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', this.foundFilter.bind(this));
         const foo = new Foot(this.pageRoot)
         foo.render()
     }
