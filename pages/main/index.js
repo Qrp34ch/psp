@@ -1,47 +1,68 @@
 // import {ButtonComponent} from "../../components/button/index.js";
 import {ProductCardComponent} from "../../components/product-card/index.js";
-
 import {Shapk} from "../../components/shapk/index.js";
-
 import {Foot} from "../../components/foot/index.js";
-
 import {ProductPage} from "../product/index.js";
+import {NewJobPage} from "../newjob/index.js"
+import {EditJobPage} from "../editJob/index.js"
+
+import {ajax} from "../../modules/ajax.js";
+import {stockUrls} from "../../modules/stockUrls.js";
 
 export class MainPage {
     constructor(parent) {
         this.parent = parent;
-        this.data = [{
-            id: 1,
-            src: "https://www.mosvodokanal.ru/upload/iblock/d36/voditel.jpg",
-            title: "Водитель автомобиля",
-            zp: 80000,
-            text: "от 80 000 ₽ на руки",
-            detali: "<p>Требуемый опыт работы: 1–3 года.</p><p>Полная занятость, полный день</p>",
-            code: 1
-        },
-        {
-            id: 2,
-            src: "https://www.mosvodokanal.ru/upload/iblock/b3b/slesar_avr.jpg",
-            title: "Слесарь аварийно-восстановительных работ",
-            zp: 95000,
-            text: "от 95 000 ₽ на руки",
-            detali: "<p>Требуемый опыт работы: не требуется</p><p>Пятидневная рабочая неделя, сменный график</p>",
-            code: 2
-        },
-        {
-            id: 3,
-            src: "https://www.mosvodokanal.ru/upload/iblock/1ed/rabotnik_ozelenitel.jpg",
-            title: "Рабочий зеленого хозяйства 3 разряда",
-            zp: 59000,
-            text: "от 59 000 ₽",
-            detali: "<p>Требуемый опыт работы: не требуется</p><p>Полная занятость, полный день</p>",
-            code: 3
-        },]
+        this.container = null;
+        this.data = [];
     }
 
     getData() {
-        return this.data
+        return new Promise((resolve, reject) => {
+            ajax.get(stockUrls.getStocks(), 
+                (data) => {
+                    if (!data || !Array.isArray(data)) {
+                        console.error('Получены некорректные данные:', data);
+                        reject(new Error('Invalid data format'));
+                        return;
+                    }
+                    this.data = data;
+                    resolve(data);
+                },
+                (error) => {
+                    console.error('Ошибка загрузки данных:', error);
+                    reject(error);
+                }
+            );
+        });
     }
+
+    async renderData(items) {
+        if (!this.container) {
+            this.container = this.pageRoot.querySelector('.cards-container');
+            if (!this.container) {
+                console.error('Контейнер карточек не найден!');
+                return;
+            }
+        }
+        
+        this.container.innerHTML = '';
+        
+        if (!items || !Array.isArray(items)) {
+            console.error('Некорректные данные для рендера:', items);
+            return;
+        }
+        
+        items.forEach((item) => {
+            const productCard = new ProductCardComponent(this.container);
+            productCard.render(
+                item,
+                (e) => this.clickCard(e),
+                (e) => this.clickDEL(e),
+                (e) => this.clickEDIT(e)
+            );
+        });
+    }
+    // изменения конец
 
     get pageRoot() {
         return document.getElementById('main-page')
@@ -51,33 +72,35 @@ export class MainPage {
         return (
             `
                 <div id="main-page" class="d-flex flex-column"><div/>
-                <div class="zadania">
-                <button id="zad12" class="btn-home1" type="button">ДЗ</button>
-                <input type="text" class="search_pg" id="searchInput" placeholder="Введите текст для пока...">
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                                <div id="ogo" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                                    <div class="toast-header">
-                                    <img src="https://eaz-ekb.ru/upload/iblock/d22/uo86s9d1zj0c6lwsro0hbjgkmd2xkemz.png" class="rounded me-2" alt="картинка" style="widght: 30px; height: 30px;">
-                                    <strong class="me-auto">Задания</strong>
-                                    <small>сейчас</small>
-                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Закрыть"></button>
-                                    </div>
-                                    <div class="toast-body" style="color: black;">
-                                    <div>Количество повторяющихся записей = ${m12}</div>
-                                    <div>Среднее арифметическое зарплат = ${m18}</div>
-                                    <div>Диапазоны ID записей: ${m22}</div>
-                                    <div>"Привет" - палиндром: ${m381}</div>
-                                    <div>"Приветтевирп" - палиндром: ${m382}</div>
-                                    </div>
-                                </div>
-                                </div>
-                
+                <div class="zadania"> 
+                    <button id="add-zap" class="btn-home1" type="button">добавить вакансию</button>
+                    <button id="zad12" class="btn-home1" type="button">ДЗ</button>
+                    <input type="text" class="search_pg" id="searchInput" placeholder="Введите текст для пока...">
+                    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                        <div id="ogo" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <img src="https://eaz-ekb.ru/upload/iblock/d22/uo86s9d1zj0c6lwsro0hbjgkmd2xkemz.png" class="rounded me-2" alt="картинка" style="widght: 30px; height: 30px;">
+                                <strong class="me-auto">Задания</strong>
+                                <small>сейчас</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="toast-body" style="color: black;">
+                                <div>Количество повторяющихся записей = ${m12}</div>
+                                <div>Среднее арифметическое зарплат = ${m18}</div>
+                                <div>Диапазоны ID записей: ${m22}</div>
+                                <div>"Привет" - палиндром: ${m381}</div>
+                                <div>"Приветтевирп" - палиндром: ${m382}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="cards-container"></div>
                 
             `
         )
     }
-    
+
+   
     FoundIndex(x){
         for (let i = 0; i <= this.data.length; i++){
             if (this.data[i].id == x){
@@ -86,41 +109,73 @@ export class MainPage {
         }
         return -1;
     }
-    
+
     clickCard(e) {
-        const cardId = e.target.dataset.id
-        const kai = this.data[this.FoundIndex(cardId)]
-        const productPage = new ProductPage(this.parent, cardId, kai)
-        productPage.render()
-    } 
+        // Получаем ID из data-атрибута кнопки
+        const cardId = e.target.dataset.id;
+        
+        // Находим соответствующую вакансию
+        const vacancy = this.data.find(item => item.id == cardId);
+        
+        if (vacancy) {
+            const productPage = new ProductPage(this.parent, cardId, vacancy);
+            productPage.render();
+        } else {
+            console.error('Вакансия не найдена');
+        }
+    }
+
     clickADD() {
-        let AddData = {
-            id: 0,
-            src: "https://www.mosvodokanal.ru/upload/iblock/d36/voditel.jpg",
-            title: "Водитель автомобиля",
-            zp: 80000,
-            text: "от 80 000 ₽ на руки",
-            detali: "<p>Требуемый опыт работы: 1–3 года.</p><p>Полная занятость, полный день</p>",
-            code: 1
-        }
-        if (this.data.length >= 0){
-            AddData.id = this.data.slice(-1)[0].id + 1
-        }
-        else{
-            AddData.id = 1
-        }
-        this.data.push(AddData)
-        this.render()
-    } 
+        const newJobPage = new NewJobPage(this.parent, (newVacancy) => {
+            this.data.push(newVacancy);
+            console.log('Данные после добавления:', this.data);
+            
+            // Аккуратно обновляем только контейнер с карточками
+            const container = this.pageRoot.querySelector('.cards-container');
+            container.innerHTML = '';
+            this.renderData(this.data, container);
+            },
+            this.data
+        );
+        newJobPage.render();
+        console.log('Данные после добавления:', this.data);
+    }
+    clickEDIT(e) {
+        const editJobPage = new EditJobPage(this.parent, (editVacancy) => {
+            this.data = this.data.filter(item => item.id !== editVacancy.id);
+            this.data.push(editVacancy);
+            console.log('Данные после добавления:', this.data);
+            
+            // Аккуратно обновляем только контейнер с карточками
+            const container = this.pageRoot.querySelector('.cards-container');
+            container.innerHTML = '';
+            this.renderData(this.data, container);
+            },
+            parseInt(e.target.dataset.id),
+            this.data
+        );
+        editJobPage.render();
+        console.log('Данные после добавления:', this.data);
+    }
 
     clickDEL(e) {
-        const cardId = e.target.dataset.id
-        const kai = this.FoundIndex(cardId)
-        if (kai !== -1){
-            this.data.splice(kai, 1)
+        const cardId = parseInt(e.target.dataset.id);
+        if (isNaN(cardId)) return;
+
+        // Удаляем из массива данных
+        this.data = this.data.filter(item => item.id !== cardId);
+        
+        // Удаляем с сервера (если нужно)
+        ajax.delete(stockUrls.removeStockById(cardId), () => {
+            console.log('Удалено с сервера');
+        });
+        
+        // Обновляем UI
+        const container = this.pageRoot.querySelector('.cards-container');
+        if (container) {
+            this.renderData(this.data, container);
         }
-        this.render()
-    } 
+    }
 
 
     // 1.2
@@ -210,7 +265,7 @@ export class MainPage {
             rev_str += str[i];
         }
         if (rev_str === str) {
-            return 'нет'
+            return 'да'
         }
         else {
             return 'нет'
@@ -221,38 +276,36 @@ export class MainPage {
         const searchInput = document.getElementById('searchInput');
         const searchTerm = searchInput.value.toLowerCase();
         console.log(searchTerm);
-        const filtData = this.data.filter(card => {
-            const cardText = card.title.toLowerCase();
-            return cardText.includes(searchTerm);
-        });
-        this.pageRoot.querySelector('.cards-container').innerHTML = '';
-        const container = this.pageRoot.querySelector('.cards-container');
-        filtData.forEach((item) => {
-            const productCard = new ProductCardComponent(container);
-            productCard.render(item, this.clickCard.bind(this), this.clickDEL.bind(this));
+        ajax.get(stockUrls.getStocks(), (data) => {
+            const filtData = data.filter(card => {
+                const cardText = card.title.toLowerCase();
+                return cardText.includes(searchTerm);
+            });
+            this.pageRoot.querySelector('.cards-container').innerHTML = '';
+            const container = this.pageRoot.querySelector('.cards-container');
+            this.renderData(filtData, container);
         });
         
-        return filtData;
     }
-   
-    render() {
+     
+    async render() {
         this.parent.innerHTML = ''
+
         const html = this.getHTML(this.countIdentic(), this.srZnach(), this.diapazon(), this.palindrome1("Привет"), this.palindrome2("Приветтевирп"))
         this.parent.insertAdjacentHTML('beforeend', html)
         
         const shap = new Shapk(this.pageRoot)
-        shap.render(this.clickCard.bind(this), this.clickADD.bind(this))
-        
-        const data = this.getData()
-        data.forEach((item) => {
-            const productCard = new ProductCardComponent(this.pageRoot)
-            productCard.render(item, this.clickCard.bind(this), this.clickDEL.bind(this))
-        })
+        shap.render(this.clickCard.bind(this))
+
+        const data = await this.getData();
+        await this.renderData(data);
+        const addButton = document.getElementById('add-zap')
+        addButton.addEventListener('click', this.clickADD.bind(this))
+
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', this.foundFilter.bind(this));
+
         const foo = new Foot(this.pageRoot)
         foo.render()
     }
 }
-
-
