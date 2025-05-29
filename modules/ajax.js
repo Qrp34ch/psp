@@ -4,16 +4,20 @@ class Ajax {
      * @param {string} url - Адрес запроса
      * @param {function} callback - Функция обратного вызова (data, status)
      */
-    get(url, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url);
-        xhr.send();
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
-            }
-        };
+    async get(url, callback=null) {
+        try {
+            const response = await fetch(url);
+                        
+            const data = await response.json();
+            
+            if (callback !== null) {callback(data, response.status);}
+            
+            return data;
+            
+        } catch (error) {
+            console.error('Ошибка GET запроса:', error);
+            
+        }
     }
 
     /**
@@ -22,17 +26,34 @@ class Ajax {
      * @param {object} data - Данные для отправки
      * @param {function} callback - Функция обратного вызова (data, status)
      */
-    post(url, data, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', url);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
+    async post(url, data, callback=null) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
 
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
+            const responseText = await response.text();
+            if (!responseText) {
+                if (callback) callback(null, response.status);
+                return null;
             }
-        };
+            const responseData = JSON.parse(responseText);
+
+            if (callback) {
+                callback(responseData, response.status);
+            }
+
+            return responseData;
+
+        } catch (error) {
+            console.error('Ошибка POST запроса:', error);
+            
+        }
     }
 
     /**
@@ -41,50 +62,66 @@ class Ajax {
      * @param {object} data - Данные для обновления
      * @param {function} callback - Функция обратного вызова (data, status)
      */
-    patch(url, data, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PATCH', url);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
+    async patch(url, data, callback=null)
+    {
+        try {
+            const response = await fetch (url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+            });
+            let responseData = null
+            try { // тут try потому что может быть пустой ответ
+                responseData = await response.json(); 
             }
-        };
+            catch (e){
+                responseData = null
+            }
+            if (callback !== null) {callback(responseData, response.status)}
+            return data;
+        } catch (error)
+        {
+            console.error('Ошибка PATCH запроса:', error);
+        }
     }
+
 
     /**
      * DELETE запрос
      * @param {string} url - Адрес запроса
      * @param {function} callback - Функция обратного вызова (data, status)
      */
-    delete(url, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('DELETE', url);
-        xhr.send();
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
-            }
-        };
-    }
-
-    /**
-     * Обработчик ответа (приватный метод)
-     * @param {XMLHttpRequest} xhr - Объект запроса
-     * @param {function} callback - Функция обратного вызова
-     */
-    _handleResponse(xhr, callback) {
+    async delete(url, callback=null) {
         try {
-            const data = xhr.responseText ? JSON.parse(xhr.responseText) : null;
-            callback(data, xhr.status);
-        } catch (e) {
-            console.error('Ошибка парсинга JSON:', e);
-            callback(null, xhr.status);
+        const response = await fetch(url, {
+            method: 'DELETE'
+        });
+        let data = null
+        try { // тут try потому что может быть пустой ответ
+            data = await response.json(); 
         }
+        catch (e){
+            data = null
+        }
+        
+
+        if(callback !== null) 
+        {
+            callback(data, response.status)
+        }
+
+        return data
+        } catch (error)
+        {
+            console.error('Ошибка DELETE запроса:', error);
+        }
+
+
     }
+
+
 }
 
 export const ajax = new Ajax();
