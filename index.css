@@ -1,5 +1,40 @@
 body{
     background: #e7eef6;
+    .search_pg{
+        margin-left: 25px;
+        width: 500px;
+        border: solid 1px #b5c9d8;
+        background: #fff;
+        box-shadow: inset 1px 1px 0 rgba(79, 110, 179, 0.12);
+        border-radius: 1px;
+        padding: 2px 9px 0;
+        box-sizing: border-box;
+        height: 31px;
+        cursor: text;
+    }
+    .opis{
+        margin-left: 25px;
+        font: normal 16px / 24px "PF Din", "Helvetica", "Arial", sans-serif;
+        color: #000;
+    }
+    .Inp{
+        margin-left: 100px;
+        /* margin-right: auto; */
+        margin-top: 20px;
+    }
+    .btn-add{
+        font-weight: bold;
+        background: #0063a8;
+        color: #fff;
+        border-width: 0;
+        text-transform: uppercase;
+        font-size: 16px;
+        min-width: 130px;
+        padding: 15px 25px 10px;
+        margin-left: 125px;
+        margin-top: 30px;
+        text-align: center;
+    }
     .shapk {
         background: #0063a8;
         width: 100%;
