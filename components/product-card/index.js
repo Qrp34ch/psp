@@ -2,19 +2,6 @@ export class ProductCardComponent {
     constructor(parent) {
         this.parent = parent;
     }
-
-    addListeners(data, listener) {
-        document
-            .getElementById(`click-card-${data.id}`)
-            .addEventListener("click", listener)
-    }
-
-    delListeners(data, listener) {
-        document
-            .getElementById(`del-card-${data.id}`)
-            .addEventListener("click", listener)
-    }
-
     getHTML(data) {
         return (
             `
@@ -24,20 +11,31 @@ export class ProductCardComponent {
                         <h5 class="card-title">${data.title}</h5>
                         <p class="card-text">${data.text}</p>
                         <div class="buttons">
-                            <button class="btn btn-primary" id="click-card-${data.id}" data-id="${data.id}">Подробнее</button>
-                            <button class="btn btn-primary" id="del-card-${data.id}" data-id="${data.id}" style="margin-left: 10px;"">Удалить запись</button>
+                            <button class="btn btn-primary details-btn" id="click-card-${data.id}" data-id="${data.id}">Подробнее</button>
+                            <button class="btn btn-primary edit-btn" id="edit-card-${data.id}" data-id="${data.id}" style="margin-left: 10px;"">Изменить</button>
+                            <button class="btn btn-primary delete-btn" id="del-card-${data.id}" data-id="${data.id}" style="margin-left: 10px;"">Удалить</button>
                         </div>
                     </div>
                 </div>
             `
         )
     }
-    
-    render(data, listener, listener1) {
-        const html = this.getHTML(data)
-        this.parent.insertAdjacentHTML('beforeend', html)
-        this.addListeners(data, listener)
-        this.delListeners(data, listener1)
+
+    render(item, clickHandler, deleteHandler, editHandler) {
+        const html = this.getHTML(item)
+               
+        this.parent.insertAdjacentHTML('beforeend', html);
+        
+        // Находим элементы только что добавленной карточки
+        // const cardElement = this.parent.querySelector(`.card[data-id="${item.id}"]`);
+        const cardElement = this.parent.lastElementChild;
+        const detailsButton = cardElement.querySelector('.details-btn');
+        const deleteButton = cardElement.querySelector('.delete-btn');
+        const editButton = cardElement.querySelector('.edit-btn');
+        
+        // Добавляем обработчики
+        detailsButton.addEventListener('click', clickHandler);
+        deleteButton.addEventListener('click', deleteHandler);
+        editButton.addEventListener('click', editHandler);
     }
 }
-

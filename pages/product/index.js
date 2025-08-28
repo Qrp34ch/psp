@@ -4,6 +4,8 @@ import {Shapk} from "../../components/shapk/index.js";
 import {Foot} from "../../components/foot/index.js";
 import {BackButtonComponent} from "../../components/back-button/index.js";
 import {MainPage} from "../main/index.js";
+import {ajax} from "../../modules/ajax.js";
+import {stockUrls} from "../../modules/stockUrls.js";
 
 export class ProductPage {
     constructor(parent, id, data) {
@@ -12,8 +14,16 @@ export class ProductPage {
         this.data = data
     }
 
-    getData() {
-        return this.data
+    getData(callback) {
+        ajax.get(stockUrls.getStockById(this.id), (data) => {
+            this.renderData(data);
+            callback();
+        });
+    }
+
+    renderData(item) {
+        const product = new ProductComponent(this.pageRoot)
+        product.render(item)
     }
 
     get pageRoot() {
@@ -43,12 +53,10 @@ export class ProductPage {
     
         const backButton = new BackButtonComponent(this.pageRoot)
         backButton.render(this.clickBack.bind(this))
-    
-        const data = this.getData()
-        const stock = new ProductComponent(this.pageRoot)
-        stock.render(data)
-        const foo = new Foot(this.pageRoot)
-        foo.render()
+
+        this.getData(() => {
+            const foo = new Foot(this.pageRoot);
+            foo.render();
+        });
     }
 }
-
